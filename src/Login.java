@@ -3,7 +3,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.*;
 import java.sql.SQLException;
-
 import javax.swing.*;
 
 public class Login extends JFrame implements ActionListener {
@@ -13,7 +12,7 @@ public class Login extends JFrame implements ActionListener {
     JButton createPlaylistRadioButton;
     JButton browsePlaylistsRadioButton;
     JButton deletePlaylistRadioButton , playMusic;
-    ImageIcon i ;
+    ImageIcon i ; 
     Login() {
     	dispose();
         setVisible(true);

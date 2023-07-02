@@ -23,7 +23,8 @@ public class Player extends JFrame implements ActionListener {
 		        setTitle("Music Library Project");
 		        getContentPane().setBackground(Color.BLACK);
 		        setLayout(null);
-					
+				
+		        
 			JLabel text = new JLabel("Select Song to Play");
 			add(text);
 			text.setFont(new Font("sans-serif",Font.BOLD,64));
