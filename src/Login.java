@@ -11,9 +11,14 @@ public class Login extends JFrame implements ActionListener {
     JButton openPlaylistRadioButton;
     JButton createPlaylistRadioButton;
     JButton browsePlaylistsRadioButton;
-    JButton deletePlaylistRadioButton , playMusic;
+    JButton deletePlaylistRadioButton , playMusic , logout;
     ImageIcon i ; 
-    Login() {
+    private static String just; // Static variable to store the userId
+
+     String userId;
+    Login(String userId) {
+    	this.userId = userId;
+    	just  = userId;
     	dispose();
         setVisible(true);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
@@ -79,43 +84,53 @@ public class Login extends JFrame implements ActionListener {
         playMusic.setFont(new Font("Sans-serif", Font.ITALIC, 24));
         playMusic.setBounds(480, 440, 500, 40);
         playMusic.addActionListener(this);
+      
+        logout = new JButton("Logout");
+        logout.setBackground(Color.BLACK);
+        logout.setForeground(Color.WHITE);
+        add(logout);
+        logout.setHorizontalAlignment(SwingConstants.LEFT);
+        logout.setMargin(new Insets(0, 110, 0, 0));
+        logout.setFont(new Font("Sans-serif", Font.ITALIC, 24));
+        logout.setBounds(480, 500, 500, 40);
+        logout.addActionListener(this);
         
-        openPlaylistRadioButton.addActionListener(this);
-        createPlaylistRadioButton.addActionListener(this);
-        browsePlaylistsRadioButton.addActionListener(this);
-        deletePlaylistRadioButton.addActionListener(this);
-        playMusic.addActionListener(this);
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == openPlaylistRadioButton) {
             try {
-				new OpenPlaylist();        	dispose();
+				new OpenPlaylist(userId);        	dispose();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
         } else if (ae.getSource() == createPlaylistRadioButton) {
-            new CreatePlaylist();        	dispose();
+            new CreatePlaylist(userId);        	dispose();
         } else if (ae.getSource() == browsePlaylistsRadioButton) {
             try {
-                new BrowsePlaylist();dispose();
+                new BrowsePlaylist(userId);dispose();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else if (ae.getSource() == deletePlaylistRadioButton) {      
             try {
-				new Delete();
+				new Delete(userId);
 				dispose();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
         } else if (ae.getSource() == playMusic) {    
-            new Player();dispose();
+            new Player(userId);dispose();
+        }
+        else if( ae.getSource()==logout) {
+        	new Old_user();
+        	dispose();
         }
     }
 
     public static void main(String[] args) {
-    new Login();
+    	new Login(just);
     }
 }

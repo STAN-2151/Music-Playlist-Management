@@ -11,11 +11,15 @@ public class Delete extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private JButton sub , yes;
     private JTextField DltPly;
-    String[] names;
+    String[] names , playlist_id;
     JRadioButton[] pList;
     ButtonGroup musicRadio;
-
-    public Delete() throws SQLException {
+    String userId;
+    static String  just;
+    public Delete(String userid) throws SQLException {
+    	this.userId = userid;
+    just = userId;
+    	
     	 setVisible(true);
          setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
          setTitle("Music Library Project");
@@ -63,17 +67,15 @@ public class Delete extends JFrame implements ActionListener {
         
         
         Conn obj = new Conn();
-        String query = "SELECT table_name\r\n"
-        		+ "FROM information_schema.tables\r\n"
-        		+ "WHERE table_schema = 'musiclibrary'\r\n"
-        		+ "ORDER BY table_rows DESC\r\n"
-        		+ "LIMIT 5;";
+        String query = "Select playlist_name , playlist_id from playlist where user_id = '"+userId+"' limit 5;";
         ResultSet resultSet = obj.s.executeQuery(query);
         names = new String[20];
+        playlist_id = new String[20];
 
         int i = 0;
         while (resultSet.next()) {
-            names[i] = resultSet.getString(1);
+            names[i] = resultSet.getString("playlist_name");
+            playlist_id[i] = resultSet.getString("playlist_id");
             i++;
         }
         
@@ -100,7 +102,7 @@ public class Delete extends JFrame implements ActionListener {
             for (int i = 0; i < pList.length; i++) {
                 if (pList[i].isSelected()) { 
                     Conn obj = new Conn();
-                    String query = "DROP TABLE IF EXISTS " + names[i];
+                    String query = "delete from playlist where playlist_id = '"+playlist_id[i]+"';";
                     try {
 						obj.s.executeUpdate(query);
 					} catch (SQLException e) {
@@ -108,7 +110,7 @@ public class Delete extends JFrame implements ActionListener {
 					}
                     JOptionPane.showMessageDialog(null, "Playlist removed");
                     dispose();
-                    new Login();
+                    new Login(userId);
                     return;
             }}
             
@@ -118,15 +120,16 @@ public class Delete extends JFrame implements ActionListener {
 
                 if (name.isEmpty() ) {
                     JOptionPane.showMessageDialog(null, "Invalid input");
-                } else if (name.contains(" ")) {
-                    JOptionPane.showMessageDialog(null, "You cannot add spaces in the playlist name");
                 } else {
+                	if (name.contains(" ")) {
+        				name  = name.replace(" ","_");
+            			} 
                     Conn obj = new Conn();
-                    String query = "DROP TABLE IF EXISTS " + name;
+                    String query = "delete from playlist where playlist_name = '"+name+"';";
                     obj.s.executeUpdate(query);
                     JOptionPane.showMessageDialog(null, "Playlist removed");
                     dispose(); // Close the frame after deleting the playlist
-                    new Login();
+                    new Login(userId);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -137,7 +140,7 @@ public class Delete extends JFrame implements ActionListener {
         	
 
           if (ae.getSource() == yes) {
-           dispose(); new Login();
+           dispose(); new Login(userId);
             dispose();
 
         }
@@ -148,7 +151,7 @@ public class Delete extends JFrame implements ActionListener {
 
     public static void main(String args[]) {
         try {
-            new Delete();
+            new Delete(just);
         } catch (Exception e) {
             e.printStackTrace();
         }

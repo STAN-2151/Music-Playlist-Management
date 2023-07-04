@@ -1,20 +1,20 @@
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.*;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Random;
-
 import javax.swing.*;
+
 
 public class Old_user extends JFrame implements ActionListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	JTextField  num_text , pwd_text , cap_text;
+	JTextField  num_text  , cap_text;
+	JPasswordField pwd_text;
 	JButton submit , new_user , clear;
-char[] ar = new char[5];	
+	String captcha;
+	String userId;
 Old_user(){
 		dispose();
         setVisible(true);
@@ -35,9 +35,6 @@ Old_user(){
         reg_label.setForeground(Color.WHITE);
         reg_label.setBounds(610, 80, 800, 60);
         
-        
-
-        
         JLabel number_label = new JLabel("Number Or Email:");
         add(number_label);
         number_label.setFont(new Font("Sans-serif", Font.BOLD, 24));
@@ -49,8 +46,6 @@ Old_user(){
         num_text.setBounds(683, 191, 223, 27);
         add(num_text);
 
-
-        
         JLabel pwd_label = new JLabel("Enter Password:");
         add(pwd_label);
         pwd_label.setFont(new Font("Sans-serif", Font.BOLD, 24));
@@ -58,34 +53,18 @@ Old_user(){
         pwd_label.setBounds(450, 220, 223, 60);
         pwd_label.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        pwd_text = new JTextField();
+        pwd_text = new JPasswordField();
         pwd_text.setBounds(683, 239, 223, 27);
         add(pwd_text);
-
         
-        
-        
-        JLabel captcha_label = new JLabel("Enter Captcha:");
+        JLabel captcha_label = new JLabel("Enter   Captcha :");
         add(captcha_label);
         captcha_label.setFont(new Font("Sans-serif", Font.BOLD, 24));
         captcha_label.setForeground(Color.WHITE);
         captcha_label.setBounds(450, 265, 223, 60);
         captcha_label.setHorizontalAlignment(SwingConstants.RIGHT);
-        
-        Random random = new Random();
-        int minValue = 48; // ASCII value for '0'
-        int maxValue = 90; // ASCII value for 'Z'
-        
-        for (int i = 0; i < ar.length; i++) {
-        	   int randomValue;
-        do {
-             randomValue = random.nextInt(maxValue - minValue + 1) + minValue;
-        } while (randomValue > 57 && randomValue < 65); // Exclude symbols
-
-        ar[i] = (char) randomValue;
-        }
     
-        String captcha = new String(ar);
+         captcha = helper.unique_captcha();
         JLabel captcha1_label = new JLabel(captcha);
         add(captcha1_label);
         captcha1_label.setFont(new Font("Arial", Font.BOLD, 24));
@@ -139,6 +118,72 @@ Old_user(){
 			new registration();
 			dispose();
 		}
+		
+		if( e.getSource()== submit) {
+     
+			String number_email = num_text.getText().trim();
+			char[] pass = pwd_text.getPassword();
+			String password = new String(pass);
+			String captcha_check = cap_text.getText().trim();
+        	
+        	 if( !helper.correct_num_email(number_email) ) {
+                JOptionPane.showMessageDialog(null, "Enter Correct number OR email!");
+        	}
+        	
+        	else if( !helper.correct_pass(password)) {
+                JOptionPane.showMessageDialog(null, "Wrong Password! ");
+        	}
+        	
+        	else if( ! captcha_check.equals(captcha)) {
+                JOptionPane.showMessageDialog(null, "Captcha did not match!");
+                dispose();
+                new Old_user();
+        	}
+        	else {
+        		Conn obj = new Conn();
+                String query2 = "select number, email, password , user_id from user Where number ='"+number_email+"' or email = '"+number_email+"';";
+                
+        		ResultSet rs;
+				try {
+					rs = obj.s.executeQuery(query2);
+				
+                
+        		boolean stringFound = false;
+        		String act_pass="";
+        		while (rs.next()) {
+                    String number = rs.getString("number");
+                    String email = rs.getString("email");
+                     act_pass = rs.getString("password");
+                     userId = rs.getString("user_id");
+                    if (number_email.equals(email) || number_email.equals(number)) {
+                        stringFound = true;
+                        break;
+                    }
+                }
+                if (stringFound) {
+                	if(act_pass.equals(password)) {
+                		dispose();
+                				new Login(userId);
+                				dispose();
+                	}else {
+                        JOptionPane.showMessageDialog(null, "Incorrect Password!");
+
+                	}
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid number or email address!");
+
+                }
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+            } 
+                
+                
+                
+                
+                
+        	}
 	}
 
 }
+

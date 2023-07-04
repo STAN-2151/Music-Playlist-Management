@@ -19,26 +19,31 @@ public class ViewSongs extends JFrame implements ActionListener {
     static Clip clip;
     static long pos = 0;
     JRadioButton[] sList;
+    String userId, playlistId;
 
     private static final long serialVersionUID = 1L;
 
-    public ViewSongs(String name) {
-        this.name = name;
+    public ViewSongs(String userid, String playlistid, String a) {
+        this.name = a;
+        this.userId = userid;
+        this.playlistId = playlistid;
         
          setVisible(true);
 	     setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
 	     setTitle("Music Library Project");
 	     getContentPane().setBackground(Color.BLACK);
 	     setLayout(null);
-	     
+	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         int i = 0;
 
         try {
             Conn obj = new Conn();
-            String query2 = "select distinct * from " + name;
+            String query2 = "SELECT distinct s.song_name ,s.link FROM secret AS sc JOIN song AS s ON sc.song_id = s.song_id WHERE sc.user_id = '"+userId+ "' AND sc.playlist_id = '"+playlistId+"';";
+
             ResultSet rs = obj.s.executeQuery(query2);
             while (rs.next()) {
-                songs[i] = "" + rs.getString("songs");
+                songs[i] = "" + rs.getString("song_name");
                 links[i] = "" + rs.getString("link");
                 i++;
             }
@@ -48,7 +53,7 @@ public class ViewSongs extends JFrame implements ActionListener {
 
         JLabel entName = new JLabel("Available Songs in Playlist '" + name.toUpperCase() + "'");
         add(entName);
-        entName.setFont(new Font("sans-serif", Font.BOLD, 46));
+        entName.setFont(new Font("sans-serif", Font.BOLD, 32));
         entName.setForeground(Color.WHITE);
         entName.setBounds(350, 20, 800, 60);
 
@@ -121,15 +126,15 @@ public class ViewSongs extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==MMenu) {
             dispose();
-            new Login();
+            new Login(userId);
         }
         if (e.getSource()==PMenu) {
             dispose();
-            new AddSongs(name);
+            new AddSongs(userId , playlistId ,name);
         }
         if (e.getSource()==previous) {
             dispose();
-            new songs(name);
+            new songs(userId , playlistId ,name);
         }
 
         for (int i = 0; i < sList.length; i++) {
@@ -192,6 +197,6 @@ public class ViewSongs extends JFrame implements ActionListener {
     }
 
     public static void main(String args[]) {
-        new ViewSongs("demo");
+        new ViewSongs("FDSJDBHASJ","CAYDIHBRAG","demo");
     }
 }

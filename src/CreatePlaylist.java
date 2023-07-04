@@ -8,8 +8,12 @@ public class CreatePlaylist extends JFrame implements ActionListener {
     
     private JButton submitButton , backButton;
     private JTextField playlistNameField;
+    String userId;
+    private static String just; // Static variable to store the userId
 
-    CreatePlaylist() {
+    CreatePlaylist(String userId) {
+    	just = userId;
+    	this.userId = userId;
     	setVisible(true);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
         setTitle("Music Library Project");
@@ -62,8 +66,9 @@ public class CreatePlaylist extends JFrame implements ActionListener {
         				name  = name.replace(" ","_");
             			} 
                 Conn obj = new Conn();
-                String query = "CREATE TABLE " + name.toLowerCase() + " (songs VARCHAR(20), link VARCHAR(40));";
-                
+                String unique_playlist = helper.unique_id();
+                String query = "insert into playlist values('"+name+"','"+unique_playlist+"','"+userId+"');";
+                System.out.println("sdfghn");
                 try {
                     obj.s.executeUpdate(query);
                     JOptionPane.showMessageDialog(null, "Playlist created");
@@ -72,14 +77,14 @@ public class CreatePlaylist extends JFrame implements ActionListener {
                 }
             }
         }  if (ae.getSource() == backButton) {
-            new Login();
+            new Login(userId);
             dispose();
         }
     }
 
     public static void main(String args[]) {
         try {
-            new CreatePlaylist();
+            new CreatePlaylist(just);
         } catch (Exception e) {
             e.printStackTrace();
         }

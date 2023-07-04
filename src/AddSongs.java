@@ -9,20 +9,27 @@ public class AddSongs extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 String name;
-String[] names = {"Lose Yourself", "Sidhu 295" , "Kabza" , "Stan" , "Velly" ,"Still Dre", "Till I Collapse", "Vaar" ,"The Last Ride", "Gangstas Paradise"};
-String[] links = {"lose_yourself.wav","295.wav","Kabza.wav","Stan.wav","Velly.wav","Still Dre.wav","Till I Collapse.wav","Vaar.wav","The Last Ride.wav","Gangstas Paradise.wav" };
-JRadioButton[] sList = new JRadioButton[links.length];
+JRadioButton[] sList = new JRadioButton[10];
+String[] names = new String[sList.length];
+String[] links = new String[sList.length];
+String[] song_id = new String[sList.length];
 ButtonGroup musicRadio = new ButtonGroup();
 JButton sub , play1, pause1 ,resume , view , main , previous;
 JTextField addSong;
 String songs[] = new String[40];
-String songList;
+String songList , userId , playlistId;
+static String justuser , justplaylist;
 static Clip clip;
 static long pos=0;
-	public AddSongs(String a) {
+
+
+	public AddSongs(String userid , String playlistid,String a) {
+		this.userId = userid;
+		this.playlistId = playlistid;
 		name = a;
 		String ab = "Playlist Name: "+a; 
 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	     setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
 	     setTitle("Music Library Project");
@@ -44,8 +51,23 @@ static long pos=0;
 		chooseSong.setForeground(Color.white);
 		chooseSong.setBounds(450,120,700,60);
 		
+		Conn obj = new Conn();
+		String query = "select * from song";
+		try {
+		ResultSet rs = obj.s.executeQuery(query);
+			int j = 0;
+			while (rs.next()) {
+				names[j] = rs.getString("song_name");
+				links[j] = rs.getString("link");
+				song_id[j] = rs.getString("song_id");
+				j++;
+			}
+		}catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
 		int i =0;				int bound = 200;
-		while( i < links.length/2) {
+		while( i < sList.length/2) {
 			sList[i] = new JRadioButton(names[i]);
 			add(sList[i]);
 			sList[i].setBounds(450, bound , 150 , 20);
@@ -56,7 +78,7 @@ static long pos=0;
 			bound += 40;
 			i++;
 		} bound = 200;
-		while( i < links.length) {
+		while( i < sList.length) {
 			sList[i] = new JRadioButton(names[i]);
 			add(sList[i]);
 			sList[i].setBounds(650, bound , 150 , 20);
@@ -123,17 +145,17 @@ static long pos=0;
 	public void actionPerformed(ActionEvent e) {
 		//this will show all added songs in current playlist
 		if(e.getSource()==view) {
-	    	new ViewSongs(name);
+	    	new ViewSongs(userId , playlistId ,name);
 	    	dispose();
 	    }
 		if(e.getSource()==main) {
 			dispose();
-			new Login();
+			new Login(userId);
 		}
 		
 		if(e.getSource()==previous) {
 			dispose();
-			new songs(name);
+			new songs(userId , playlistId , name);
 		}
 		
 		//code below is to add a particular song using checkbox
@@ -143,7 +165,7 @@ static long pos=0;
 			if(sList[i].isSelected()) {	
 				try {
 					Conn obj = new Conn();	
-					String query = "insert into "+name+" values('"+names[i]+"','"+links[i]+"');" ;
+					String query = "insert into secret values('"+playlistId+"','"+song_id[i]+"','"+userId+"');" ;
 						obj.s.execute(query);
 					 JOptionPane.showMessageDialog(null,names[i]+ " added!");
 						count++;
@@ -153,16 +175,7 @@ static long pos=0;
 			}
 			
 		}
-		if (count > 0) {
-	        try {
-	            // Execute ANALYZE TABLE query so it will show top playlists when deleting
-	            Conn obj = new Conn();
-	            String analyzeQuery = "ANALYZE TABLE " + name;
-	            obj.s.execute(analyzeQuery);
-	        } catch (Exception e1) {
-	            e1.printStackTrace();
-	        }
-	    } 
+		
 			
 			 if(count==0) {
 				 JOptionPane.showMessageDialog(null, "Please choose a song to add");
@@ -232,8 +245,8 @@ static long pos=0;
 		    }
 		}	
 	
-//	public static void main (String args[]) {
-//		new AddSongs("demo");
-//	}
+	public static void main (String args[]) {
+		new AddSongs("FDSJDBHASJ","NYKGXRJOKL","stan");
+	}
 	
 }

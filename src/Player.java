@@ -13,11 +13,13 @@ public class Player extends JFrame implements ActionListener {
 	ButtonGroup musicRadio = new ButtonGroup();
 	JButton play1, pause1 ,resume, next , previous , yes ;
 	String songs[] = new String[40];
-	String songList;
+	String songList , userId;
+	static String justuser;
 	static Clip clip = null;
 	static long pos=0; int index = -1;
-		public Player() {
-		      
+		public Player(String a) {
+		      	this.userId = a;
+		      	justuser = a;
 				setVisible(true);
 		        setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
 		        setTitle("Music Library Project");
@@ -98,6 +100,9 @@ public class Player extends JFrame implements ActionListener {
 		        yes.setBounds(425, 700, 560, 40);
 		        yes.setFont(new Font("Sans-serif", Font.ITALIC, 24));
 		        yes.addActionListener(this);
+		        
+		        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
 		
 		}
@@ -109,7 +114,7 @@ public class Player extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==yes) {
-				new Login();
+				new Login(userId);
 				dispose();
 			}
 			
@@ -159,13 +164,15 @@ public class Player extends JFrame implements ActionListener {
 		        JOptionPane.showMessageDialog(null, "Please choose a song first");
 		    } else {
 		    	try {
-		    		if(index>-1) {
-						playSong(links[index-1]);
-						index--;
-					 
+		    		if (index > 0) {
+		    		    playSong(links[index - 1]);
+		    		    index--;
+		    		} else {
+		    		    playSong(links[links.length - 1]);
+		    		    index = links.length - 1;
+		    		}
 		    	}
-		    		else { playSong(links[links.length-1]);}
-		    	}
+
 		    	catch(Exception we) {
 		    		we.printStackTrace();
 		    	}
@@ -216,7 +223,7 @@ public class Player extends JFrame implements ActionListener {
 	
 	
 	public static void main(String[] args) {
-		new Player();
+		new Player(justuser);
 	}
 	
 }

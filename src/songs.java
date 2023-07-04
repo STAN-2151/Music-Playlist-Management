@@ -14,9 +14,15 @@ public class songs extends JFrame implements ActionListener
 String name;
 
 	JButton yes , viewButton , addButton,removeButton;
-
-	songs(String a)
-	{		String ab = "Playlist Name: "+a; 
+	static String justuser , justplaylist;
+	String userId , playlistId;	
+	
+	songs(String userid, String playlistid , String a)
+	{	this.userId = userid;
+		this.playlistId = playlistid;
+		justuser = userid;
+		justplaylist = playlistid;
+		String ab = "Playlist Name: "+a; 
 	name=a;
 
 				
@@ -86,20 +92,20 @@ String name;
 	{
 		
 		if(ae.getSource()==yes) {
-			new Login();
+			new Login(userId);
 		}
 		else if(ae.getSource()== addButton) {
 			dispose();
-			new AddSongs(name);
+			new AddSongs(userId, playlistId , name);
 		}
 		else if(ae.getSource()==removeButton) {
 			dispose();
-			new RemoveSongs(name);
+			new RemoveSongs(userId, playlistId , name);
 			
 			}
 		else if(ae.getSource() == viewButton){
 			dispose();
-			new ViewSongs(name);
+			new ViewSongs(userId , playlistId ,name);
 		}
 		}
 	

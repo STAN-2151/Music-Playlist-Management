@@ -7,11 +7,14 @@ public class BrowsePlaylist extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     JRadioButton[] pList;
     ButtonGroup musicRadio;
-    String names[];
+    String names[] , playlist_id[];
     JButton yes;
-
-    public BrowsePlaylist() throws SQLException {
-        
+    String userId;
+    static String  just;
+    public BrowsePlaylist(String userid) throws SQLException {
+        this.userId = userid;
+        just = userid;
+    	
     	setVisible(true);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to full screen
         setTitle("Music Library Project");
@@ -25,13 +28,15 @@ public class BrowsePlaylist extends JFrame implements ActionListener {
         text.setBounds(400, 40, 920, 60);
 
         Conn obj = new Conn();
-        String query = "SHOW TABLES;";
+        String query = "Select * from playlist where user_id = '"+userId+"';";
         ResultSet resultSet = obj.s.executeQuery(query);
         names = new String[20];
+        playlist_id = new String[20];
 
         int i = 0;
         while (resultSet.next()) {
-            names[i] = resultSet.getString(1);
+            names[i] = resultSet.getString("playlist_name");
+            playlist_id[i] = resultSet.getString("playlist_id");
             i++;
         }
 
@@ -66,13 +71,13 @@ public class BrowsePlaylist extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == yes) {
             dispose();
-            new Login();
+            new Login(userId);
             dispose();
         }
         
         for (int i = 0; i < pList.length; i++) {
             if (pList[i].isSelected()) {
-            	new songs(names[i].toLowerCase());
+            	new songs(userId , playlist_id[i] , names[i] );
             	dispose();
             	}
         }        
@@ -80,7 +85,7 @@ public class BrowsePlaylist extends JFrame implements ActionListener {
 
     public static void main(String args[]) throws SQLException {
         try {
-            new BrowsePlaylist();
+            new BrowsePlaylist(just);
         } catch (SQLException e) {
             e.printStackTrace();
         }

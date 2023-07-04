@@ -12,9 +12,10 @@ public class registration extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	JTextField name_text , num_text , email_text , pwd_text , cnf_text , cap_text;
+	JTextField name_text , num_text , email_text ,  cap_text;
+	JPasswordField pwd_text , cnf_text ;
 	JButton submit , old_user , clear;
-char[] ar = new char[5];	
+	String captcha;
 	registration(){
 		dispose();
         setVisible(true);
@@ -78,7 +79,7 @@ char[] ar = new char[5];
         pwd_label.setBounds(450, 320, 223, 60);
         pwd_label.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        pwd_text = new JTextField();
+        pwd_text = new JPasswordField();
         pwd_text.setBounds(683, 341, 223, 27);
         add(pwd_text);
 
@@ -90,7 +91,7 @@ char[] ar = new char[5];
         cnf_label1.setBounds(450, 380, 223, 60);
         cnf_label1.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        cnf_text = new JTextField();
+        cnf_text = new JPasswordField();
         cnf_text.setBounds(683, 401, 223, 27);
         add(cnf_text);
         
@@ -99,22 +100,9 @@ char[] ar = new char[5];
         captcha_label.setFont(new Font("Sans-serif", Font.BOLD, 24));
         captcha_label.setForeground(Color.WHITE);
         captcha_label.setBounds(450, 440, 223, 60);
-        captcha_label.setHorizontalAlignment(SwingConstants.RIGHT);
-        
-        Random random = new Random();
-        int minValue = 48; // ASCII value for '0'
-        int maxValue = 90; // ASCII value for 'Z'
-        
-        for (int i = 0; i < ar.length; i++) {
-        	   int randomValue;
-        do {
-             randomValue = random.nextInt(maxValue - minValue + 1) + minValue;
-        } while (randomValue > 57 && randomValue < 65); // Exclude symbols
-
-        ar[i] = (char) randomValue;
-        }
+        captcha_label.setHorizontalAlignment(SwingConstants.RIGHT);        
     
-        String captcha = new String(ar);
+         captcha = helper.unique_captcha();
         JLabel captcha1_label = new JLabel(captcha);
         add(captcha1_label);
         captcha1_label.setFont(new Font("Arial", Font.BOLD, 24));
@@ -167,6 +155,57 @@ char[] ar = new char[5];
 		if( e.getSource() == old_user) {
 			new Old_user();
 			dispose();
+		}
+		
+		if( e.getSource()== submit ) {
+            String name = name_text.getText().trim();
+            String number = num_text.getText().trim();
+            String email = email_text.getText().trim();
+            
+            char[] pass = pwd_text.getPassword();
+            String password = new String(pass);
+
+            char[] conf = cnf_text.getPassword();
+            String conf_password = new String(conf);
+    
+            String captcha_check = cap_text.getText().trim();
+            	
+            	if( !helper.correct_name(name)) {
+                    JOptionPane.showMessageDialog(null, "Enter Correct name!");
+            	}
+            	else if( !helper.correct_num(number)) {
+                    JOptionPane.showMessageDialog(null, "Enter your 10 digit mobile number!");
+            	}
+            	else if( ! helper.correct_email(email)) {
+                    JOptionPane.showMessageDialog(null, "Enter Correct email");
+            	}
+            	else if( !helper.correct_pass(password)) {
+                    JOptionPane.showMessageDialog(null, "Enter Strong password! \nIt must contain One uppercase , One Lowercase , One Digit and One Special Character");
+            	}
+            	else if( ! conf_password.equals( password) ) {
+                    JOptionPane.showMessageDialog(null, "Passwords mismatched!");
+            	}
+            	else if( ! captcha_check.equals(captcha)) {
+                    JOptionPane.showMessageDialog(null, "Captcha did not match!");
+                    dispose();
+                    new registration();
+            	}
+            	else {
+            		String unique_user_id = helper.unique_id();
+            		Conn obj = new Conn();
+String query = "insert into user values( '" +name + "' ,"+ number+" ,'"+ email+"' , '"+ password + "' , '"+ unique_user_id+"');";    
+			try {
+					obj.s.execute(query);
+                    JOptionPane.showMessageDialog(null, "You may Login now!");
+					new Old_user();
+			} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+
+            	}
+
+
 		}
 	}
 
